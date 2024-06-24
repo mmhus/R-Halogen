@@ -1,3 +1,5 @@
+// Copyright 2024 10xEngineers
+
 /**
  * @file vm.h
  * @brief This file contains vm related macros and function prototypes. 

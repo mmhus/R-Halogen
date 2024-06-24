@@ -1,3 +1,5 @@
+// Copyright 2024 10xEngineers
+
 #ifndef RISCV_CSR_ENCODING_H
 #define RISCV_CSR_ENCODING_H
 
