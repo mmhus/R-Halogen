@@ -8,15 +8,15 @@ MAKEFILE_DIR := $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 RISCV_PREFIX := riscv64-unknown-elf
 QEMU :=
-SPIKE :=
+SPIKE := spike
+PK := pk
 SPIKE_ISA ?= rv64imafdcv
 
 # Source file(s)
-SRCS :=
+SRCS := program
 
-# dirname to remove extra slash at the end
-ENV_DIR = $(shell dirname ${dir ${SRCS}}/dummy)
-PROJECT_DIR := ${PROJECT}/${ENV_DIR}
+# Directory where the .c file is present
+ENV_DIR := ${MAKEFILE_DIR}/tests/correctness
 
 # Number of harts.
 NUM_HARTS ?= 1
@@ -182,7 +182,7 @@ SUBD ?= default
 RUN_DIR ?=
 ifeq (,$(RUN_DIR))
   RUN_DIR_FLAG = 0
-  RUN_DIR := ./RUN/${PROJECT_DIR}/${SUBD}
+  RUN_DIR := ${ENV_DIR}/RUN/${SUBD}
 else
   RUN_DIR_FLAG = 1
 endif
@@ -197,8 +197,7 @@ LIB_DIR ?=
 # Internal variables
 
 ELF_FILE := ${RUN_DIR}/test.elf
-DIS_FILE := ${RUN_DIR}/test.asm
-ISS_FILE := ${RUN_DIR}/test.iss
+DIS_FILE := ${RUN_DIR}/test.disasm
 
 LIB_DIR_REALPATH := $(realpath $(LIB_DIR))
 LIB_SRCS := \
@@ -215,17 +214,9 @@ COMMON_SRCS := \
 
 FRAMEWORK_CFLAGS := \
 	-Werror \
-	-ffreestanding \
-	-nostdlib \
 	-mcmodel=medany \
-	-fno-builtin \
-	-I${FRAMEWORK_DIR} \
-	-I${COMMON_DIR} \
-	-I${ENV_DIR_REALPATH} \
-	-I${LIB_DIR_REALPATH} \
 	-g \
-	-ggdb \
-	-Wl,--entry=test_top
+	-ggdb
 
 OBJDUMP_FLAGS := \
 	--all-headers \
@@ -269,16 +260,12 @@ DISM_EXP = "riscv64-unknown-elf-objdump ${OBJDUMP_FLAGS} $< > $@"
 
 
 
-default: ${ISS_FILE}
+default: compile spike
 
 setup: test
 	mkdir -p ${RUN_DIR}
-	@rm -f ${RUN_DIR}/failed.txt
-	@rm -f ${RUN_DIR}/passed.txt
-	@touch ${RUN_DIR}/failed.txt
-	@echo "make $(MAKECMDLINE)" > ${RUN_DIR}/itr.txt
 
-${ELF_FILE}: setup ${SRCS}
+${ELF_FILE}: setup ${ENV_SRCS}
 	@echo ""
 	@echo ${COMPILE_EXP} > ${RUN_DIR}/compile_cmd_rerun.sh
 	@chmod u+x ${RUN_DIR}/compile_cmd_rerun.sh
@@ -292,29 +279,15 @@ ${DIS_FILE}: ${ELF_FILE}
 	@echo "export DBG=${ELF_FILE}" > ${RUN_DIR}/temp_gdb_export.sh
 	@echo "${RISCV_PREFIX}-gdb --exec=${realpath ${ELF_FILE}} --symbols=${realpath ${ELF_FILE}}" >> ${RUN_DIR}/temp_gdb_export.sh
 
-${ISS_FILE}: ${ELF_FILE}
-	@echo ""
-	@# Create iss run script
-	@echo "#!/usr/bin/env bash" > ${RUN_DIR}/iss_cmd_rerun.sh
-	@echo "" >> ${RUN_DIR}/iss_cmd_rerun.sh
-	@echo "CMD='${ISS_EXP}'" >> ${RUN_DIR}/iss_cmd_rerun.sh
-	@echo "eval \$${CMD}" >> ${RUN_DIR}/iss_cmd_rerun.sh
-	@chmod u+x ${RUN_DIR}/iss_cmd_rerun.sh
-	${RUN_DIR}/iss_cmd_rerun.sh
-	@mv ${RUN_DIR}/failed.txt ${RUN_DIR}/passed.txt
-
 compile: ${ELF_FILE} ${DIS_FILE}
 	@echo ""
-	@mv ${RUN_DIR}/failed.txt ${RUN_DIR}/passed.txt
 
 test:
 # ifeq (1,${ARCHTEST_LISTER_ON})
 	@echo ""
-	@echo "PROJECT : "${PROJECT}
 	@echo "RUN_DIR : "${RUN_DIR}
 	@echo "ELF_FILE: "${ELF_FILE}
 	@echo "DIS_FILE: "${DIS_FILE}
-	@echo "ISS_FILE: "${ISS_FILE}
 	@echo "SRCS    : "${SRCS}
 	@echo "ENV_DIR : "${ENV_DIR_REALPATH}
 	@echo "ENV_SRCS: "${ENV_SRCS}
@@ -331,7 +304,7 @@ endif
 
 spike:
 	@echo ""
-	$(SPIKE)/spike --isa=$(SPIKE_ISA) -l --log-commits ${ELF_FILE} 1> $@.out 2> $@.err
+	$(SPIKE) --isa=$(SPIKE_ISA) -l --log-commits ${PK} ${ELF_FILE} 1> ${RUN_DIR}/$@.out 2> ${RUN_DIR}/$@.err
 
 qemu:
 	@echo ""
@@ -340,5 +313,6 @@ qemu:
 clean:
 	rm -f  $(MAKEFILE_DIR)/temp.sh
 	rm -rf $(MAKEFILE_DIR)/LINT_RUN
-	rm -rf $(MAKEFILE_DIR)/RUN
+	rm -rf $(ENV_DIR)/RUN
+
 
