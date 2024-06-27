@@ -7,16 +7,17 @@ MAKEFILE_DIR := $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 # Arguments
 
 RISCV_PREFIX := riscv64-unknown-elf
-QEMU :=
+QEMU := qemu-riscv64
 SPIKE := spike
 PK := pk
 SPIKE_ISA ?= rv64imafdcv
 
 # Source file(s)
-SRCS := program
+C_SRC = program.c
+ASM_SRC = program.S
 
-# Directory where the .c file is present
-ENV_DIR := ${MAKEFILE_DIR}/tests/correctness
+# Directory where the .c and .S files are present
+TESTS_DIR := ${MAKEFILE_DIR}/tests/correctness
 
 # Number of harts.
 NUM_HARTS ?= 1
@@ -30,7 +31,7 @@ ARCH_D               := 1
 ARCH_C               := 1
 ARCH_H               := 1
 ARCH_CBO             := 1
-ARCH_V               := 0
+ARCH_V               := 1
 ARCH_ZIFENCEI        := 1
 ARCH_B               := 1
 ifneq ($(ARCH_B),0)
@@ -178,11 +179,12 @@ endif
 CFLAGS2 := ${CFLAGS_PROJECT} ${CFLAG_ENTROPY} ${CFLAGS} ${CFLAGS_V}
 
 # Run and output directory
-SUBD ?= default
 RUN_DIR ?=
 ifeq (,$(RUN_DIR))
   RUN_DIR_FLAG = 0
-  RUN_DIR := ${ENV_DIR}/RUN/${SUBD}
+  RUN_DIR := ${TESTS_DIR}/RUN
+  SPIKE_DIR := ${RUN_DIR}/spike
+  QEMU_DIR := ${RUN_DIR}/qemu
 else
   RUN_DIR_FLAG = 1
 endif
@@ -196,8 +198,21 @@ LIB_DIR ?=
 ##############################################################################
 # Internal variables
 
-ELF_FILE := ${RUN_DIR}/test.elf
-DIS_FILE := ${RUN_DIR}/test.disasm
+# Output binary and disassembly of c source file
+ELF_C_FILE := ${SPIKE_DIR}/c_test.elf
+DIS_C_FILE := ${SPIKE_DIR}/c_test.disasm
+
+# Output binary and disassembly of assembly source file
+ELF_ASM_FILE := ${SPIKE_DIR}/asm_test.elf
+DIS_ASM_FILE := ${SPIKE_DIR}/asm_test.disasm
+
+# Output log files of c source file
+SPIKE_OUT_C := ${SPIKE_DIR}/c_spike.out
+SPIKE_LOG_C := ${SPIKE_DIR}/c_spike.err
+
+# Output log files of assembly source file
+SPIKE_OUT_ASM := ${SPIKE_DIR}/asm_spike.out
+SPIKE_LOG_ASM := ${SPIKE_DIR}/asm_spike.err
 
 LIB_DIR_REALPATH := $(realpath $(LIB_DIR))
 LIB_SRCS := \
@@ -250,8 +265,11 @@ endif
 ##############################################################################
 # Expansions
 
-COMPILE_EXP = "riscv64-unknown-elf-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} -o $@"
-DISM_EXP = "riscv64-unknown-elf-objdump ${OBJDUMP_FLAGS} $< > $@"
+COMPILE_EXP_C = "riscv64-unknown-elf-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} ${TESTS_DIR}/${C_SRC} -o $@"
+DISM_EXP_C = "riscv64-unknown-elf-objdump ${OBJDUMP_FLAGS} $< > $@"
+
+COMPILE_EXP_ASM = "riscv64-unknown-elf-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} -nostartfiles ${TESTS_DIR}/${ASM_SRC} -o $@"
+DISM_EXP_ASM = "riscv64-unknown-elf-objdump ${OBJDUMP_FLAGS} $< > $@"
 
 ##############################################################################
 # Targets
@@ -263,48 +281,82 @@ DISM_EXP = "riscv64-unknown-elf-objdump ${OBJDUMP_FLAGS} $< > $@"
 default: compile spike
 
 setup: test
-	mkdir -p ${RUN_DIR}
+	mkdir -p ${SPIKE_DIR}
 
-${ELF_FILE}: setup ${ENV_SRCS}
+# Compile .c Source File
+${ELF_C_FILE}: setup ${TESTS_DIR}/${C_SRC}
 	@echo ""
-	@echo ${COMPILE_EXP} > ${RUN_DIR}/compile_cmd_rerun.sh
-	@chmod u+x ${RUN_DIR}/compile_cmd_rerun.sh
-	${RISCV_PREFIX}-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} -o $@
+	@echo ${COMPILE_EXP_C} > ${SPIKE_DIR}/c_compile_cmd_rerun.sh
+	@chmod u+x ${SPIKE_DIR}/c_compile_cmd_rerun.sh
+	${RISCV_PREFIX}-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} ${TESTS_DIR}/${C_SRC} -o $@
 
-${DIS_FILE}: ${ELF_FILE}
+${DIS_C_FILE}: ${ELF_C_FILE}
 	@echo ""
-	@echo ${DISM_EXP} > ${RUN_DIR}/dism_cmd_rerun.sh
-	@chmod u+x ${RUN_DIR}/dism_cmd_rerun.sh
+	@echo ${DISM_EXP_C} > ${SPIKE_DIR}/c_dism_cmd_rerun.sh
+	@chmod u+x ${SPIKE_DIR}/c_dism_cmd_rerun.sh
 	${RISCV_PREFIX}-objdump ${OBJDUMP_FLAGS} $< > $@
-	@echo "export DBG=${ELF_FILE}" > ${RUN_DIR}/temp_gdb_export.sh
-	@echo "${RISCV_PREFIX}-gdb --exec=${realpath ${ELF_FILE}} --symbols=${realpath ${ELF_FILE}}" >> ${RUN_DIR}/temp_gdb_export.sh
+	@echo "export DBG=${ELF_C_FILE}" > ${SPIKE_DIR}/c_temp_gdb_export.sh
+	@echo "${RISCV_PREFIX}-gdb --exec=${realpath ${ELF_C_FILE}} --symbols=${realpath ${ELF_C_FILE}}" >> ${SPIKE_DIR}/c_temp_gdb_export.sh
 
-compile: ${ELF_FILE} ${DIS_FILE}
+compile_c: ${ELF_C_FILE} ${DIS_C_FILE}
 	@echo ""
+
+# Compile .S Source File
+${ELF_ASM_FILE}: setup ${TESTS_DIR}/${ASM_SRC}
+	@echo ""
+	@echo ${COMPILE_EXP_ASM} > ${SPIKE_DIR}/asm_compile_cmd_rerun.sh
+	@chmod u+x ${SPIKE_DIR}/asm_compile_cmd_rerun.sh
+	${RISCV_PREFIX}-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} -nostartfiles ${TESTS_DIR}/${ASM_SRC} -o $@
+
+${DIS_ASM_FILE}: ${ELF_ASM_FILE}
+	@echo ""
+	@echo ${DISM_EXP_ASM} > ${SPIKE_DIR}/asm_dism_cmd_rerun.sh
+	@chmod u+x ${SPIKE_DIR}/asm_dism_cmd_rerun.sh
+	${RISCV_PREFIX}-objdump ${OBJDUMP_FLAGS} $< > $@
+	@echo "export DBG=${ELF_ASM_FILE}" > ${SPIKE_DIR}/asm_temp_gdb_export.sh
+	@echo "${RISCV_PREFIX}-gdb --exec=${realpath ${ELF_ASM_FILE}} --symbols=${realpath ${ELF_ASM_FILE}}" >> ${SPIKE_DIR}/asm_temp_gdb_export.sh
+
+compile_asm: ${ELF_ASM_FILE} ${DIS_ASM_FILE}
+	@echo ""
+
+compile: compile_c compile_asm
 
 test:
 # ifeq (1,${ARCHTEST_LISTER_ON})
 	@echo ""
-	@echo "RUN_DIR : "${RUN_DIR}
-	@echo "ELF_FILE: "${ELF_FILE}
-	@echo "DIS_FILE: "${DIS_FILE}
-	@echo "SRCS    : "${SRCS}
-	@echo "ENV_DIR : "${ENV_DIR_REALPATH}
-	@echo "ENV_SRCS: "${ENV_SRCS}
-	@echo "LIB_DIR : "${LIB_DIR_REALPATH}
-	@echo "LIB_SRCS: "${LIB_SRCS}
-	@echo "CFLAGS  : "${CFLAGS2}
-	@echo "LDFLAGS : "${LDFLAGS}
-	@echo "MARCH   : "${MARCH_ALL}
+	@echo "RUN_DIR		: "${RUN_DIR}
+	@echo "SPIKE_DIR	: "${SPIKE_DIR}
+	@echo "QEMU_DIR		: "${QEMU_DIR}
+	@echo "ELF_C_FILE	: "${ELF_C_FILE}
+	@echo "DIS_C_FILE	: "${DIS_C_FILE}
+	@echo "ELF_ASM_FILE	: "${ELF_ASM_FILE}
+	@echo "DIS_ASM_FILE	: "${DIS_ASM_FILE}
+	@echo "C_SRC     	: "${C_SRC}
+	@echo "ASM_SRC     	: "${ASM_SRC}
+	@echo "ENV_DIR   	: "${ENV_DIR_REALPATH}
+	@echo "ENV_SRCS  	: "${ENV_SRCS}
+	@echo "LIB_DIR   	: "${LIB_DIR_REALPATH}
+	@echo "LIB_SRCS  	: "${LIB_SRCS}
+	@echo "CFLAGS    	: "${CFLAGS2}
+	@echo "LDFLAGS   	: "${LDFLAGS}
+	@echo "MARCH     	: "${MARCH_ALL}
 	@echo ""
 # endif
-ifndef SRCS
-	$(error SRCS is undefined)
+ifndef C_SRC
+	$(error C_SRC is undefined)
 endif
 
-spike:
+# Run C Binary on Spike
+spike_c:
 	@echo ""
-	$(SPIKE) --isa=$(SPIKE_ISA) -l --log-commits ${PK} ${ELF_FILE} 1> ${RUN_DIR}/$@.out 2> ${RUN_DIR}/$@.err
+	$(SPIKE) --isa=$(SPIKE_ISA) -l --log-commits ${PK} ${ELF_C_FILE} 1> ${SPIKE_OUT_C} 2> ${SPIKE_LOG_C}
+
+# Run Assembly Binary on Spike
+spike_asm:
+	@echo ""
+	$(SPIKE) --isa=$(SPIKE_ISA) -l --log-commits ${PK} ${ELF_ASM_FILE} 1> ${SPIKE_OUT_ASM} 2> ${SPIKE_LOG_ASM}
+
+spike: spike_c spike_asm
 
 qemu:
 	@echo ""
@@ -313,6 +365,6 @@ qemu:
 clean:
 	rm -f  $(MAKEFILE_DIR)/temp.sh
 	rm -rf $(MAKEFILE_DIR)/LINT_RUN
-	rm -rf $(ENV_DIR)/RUN
+	rm -rf $(TESTS_DIR)/RUN
 
 
