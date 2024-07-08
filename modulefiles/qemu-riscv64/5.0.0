@@ -1,3 +1,5 @@
+# Copyright 2024 10xEngineers
+
 #%Module1.0
 #####################################################################
 ## Modulefile to load QEMU 5.0.0 version
