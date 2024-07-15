@@ -6,11 +6,26 @@ MAKEFILE_DIR := $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 ##############################################################################
 # Arguments
 
-RISCV_PREFIX := riscv64-unknown-elf
-QEMU := qemu-riscv64
-SPIKE := spike
-SPIKE_ISA ?= rv64imafdcv
-PK := pk
+# Default architecture
+ARCH ?= riscv
+
+# Default RISCV_PREFIX
+RISCV_PREFIX := riscv64-unknown-linux-gnu
+# Default ARM_PREFIX
+ARM_PREFIX := aarch64-none-linux-gnu
+
+# Default prefixes and tools based on architecture
+ifeq ($(ARCH),riscv)
+    CROSS_PREFIX := ${RISCV_PREFIX}
+    QEMU := qemu-riscv64
+    SPIKE := spike
+    SPIKE_ISA ?= rv64imafdcv
+    PK := pk
+else ifeq ($(ARCH),arm)
+    CROSS_PREFIX := ${ARM_PREFIX}
+    QEMU := qemu-aarch64
+	SPIKE :=
+endif
 
 # Project name
 PROJECT := R-Halogen
@@ -34,7 +49,7 @@ ARCH_D               := 1
 ARCH_C               := 1
 ARCH_H               := 1
 ARCH_CBO             := 1
-ARCH_V               := 0
+ARCH_V               := 1
 ARCH_ZIFENCEI        := 1
 ARCH_B               := 1
 ifneq ($(ARCH_B),0)
@@ -54,112 +69,116 @@ ARCH_V_CRYPTO        := 1
 
 # Architecture options to compiler.
 MARCH_ALL            :=
-MARCH_RV             := rv64
-MARCH_I              := i2p1
-MARCH_M              := _m2p0
-MARCH_A              := _a2p1
-MARCH_F              := _f2p2
-MARCH_D              := _d2p2
-MARCH_C              := _c2p0
-MARCH_V              := _v
-MARCH_CBO            := _zicbom_zicbop_zicboz
-MARCH_H              := _h1p0
-MARCH_ZIFENCEI       := _zifencei
-MARCH_B              := _zba2p0_zbb2p0_zbs2p0
-MARCH_ZBC            := _zbc2p0
-MARCH_ZCB            := _zcb
-MARCH_ZIHINTP        := _zihintpause
-MARCH_ZFHMIN         := _zfhmin
-MARCH_ZAWRS          := _zawrs
-MARCH_ZKT            := _zkt
-MARCH_ZFA            := _zfa
-MARCH_ZICOND         := _zicond
-MARCH_VFBF           := _zvfbfmin_zvfbfwma
-MARCH_ZIMOP          := _zimop
-MARCH_ZCMOP          := _zcmop
-MARCH_V_CRYPTO       := _zvknhb_zvkned_zvkg_zvbc_zvbb
+ifeq ($(ARCH),riscv)
+	MARCH_RV             := rv64
+	MARCH_I              := i2p1
+	MARCH_M              := _m2p0
+	MARCH_A              := _a2p1
+	MARCH_F              := _f2p2
+	MARCH_D              := _d2p2
+	MARCH_C              := _c2p0
+	MARCH_V              := _v
+	MARCH_CBO            := _zicbom_zicbop_zicboz
+	MARCH_H              := _h1p0
+	MARCH_ZIFENCEI       := _zifencei
+	MARCH_B              := _zba2p0_zbb2p0_zbs2p0
+	MARCH_ZBC            := _zbc2p0
+	MARCH_ZCB            := _zcb
+	MARCH_ZIHINTP        := _zihintpause
+	MARCH_ZFHMIN         := _zfhmin
+	MARCH_ZAWRS          := _zawrs
+	MARCH_ZKT            := _zkt
+	MARCH_ZFA            := _zfa
+	MARCH_ZICOND         := _zicond
+	MARCH_VFBF           := _zvfbfmin_zvfbfwma
+	MARCH_ZIMOP          := _zimop
+	MARCH_ZCMOP          := _zcmop
+	MARCH_V_CRYPTO       := _zvknhb_zvkned_zvkg_zvbc_zvbb
 
-MARCH_ALL := $(MARCH_RV)
+	MARCH_ALL := $(MARCH_RV)
 
-ifneq ($(ARCH_I),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_I)
-endif
-ifneq ($(ARCH_M),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_M)
-endif
-ifneq ($(ARCH_A),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_A)
-endif
-ifneq ($(ARCH_F),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_F)
-endif
-ifneq ($(ARCH_D),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_D)
-endif
-ifneq ($(ARCH_C),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_C)
-endif
-ifneq ($(ARCH_V),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_V)
-endif
-ifneq ($(ARCH_H),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_H)
-endif
-ifneq ($(ARCH_CBO),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_CBO)
-endif
-ifneq ($(ARCH_ZIFENCEI),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIFENCEI)
-endif
-ifneq ($(ARCH_B),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_B)
-endif
-ifneq ($(ARCH_ZBC),0)
-  ifneq ($(ARCH_B),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZBC)
-  endif
-endif
-ifneq ($(ARCH_ZCB),0)
-  ifneq ($(ARCH_C),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCB)
-  endif
-endif
-ifneq ($(ARCH_ZHINTP),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIHINTP)
-endif
-ifneq ($(ARCH_ZFHMIN),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFHMIN)
-endif
-ifneq ($(ARCH_ZAWRS),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZAWRS)
-endif
-ifneq ($(ARCH_ZKT),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZKT)
-endif
-ifneq ($(ARCH_ZFA),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFA)
-endif
-ifneq ($(ARCH_ZICOND),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZICOND)
-endif
-ifneq ($(ARCH_VFBF),0)
-  ifneq ($(ARCH_V),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_VFBF)
-  endif
-endif
-ifneq ($(ARCH_ZIMOP),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIMOP)
-endif
-ifneq ($(ARCH_ZCMOP),0)
-  MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCMOP)
-endif
-ifneq ($(ARCH_V_CRYPTO),0)
-  ifneq ($(ARCH_V),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_V_CRYPTO)
-  endif
+	ifneq ($(ARCH_I),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_I)
+	endif
+	ifneq ($(ARCH_M),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_M)
+	endif
+	ifneq ($(ARCH_A),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_A)
+	endif
+	ifneq ($(ARCH_F),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_F)
+	endif
+	ifneq ($(ARCH_D),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_D)
+	endif
+	ifneq ($(ARCH_C),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_C)
+	endif
+	ifneq ($(ARCH_V),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_V)
+	endif
+	ifneq ($(ARCH_H),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_H)
+	endif
+	ifneq ($(ARCH_CBO),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_CBO)
+	endif
+	ifneq ($(ARCH_ZIFENCEI),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIFENCEI)
+	endif
+	ifneq ($(ARCH_B),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_B)
+	endif
+	ifneq ($(ARCH_ZBC),0)
+	ifneq ($(ARCH_B),0)
+		MARCH_ALL := $(MARCH_ALL)$(MARCH_ZBC)
+	endif
+	endif
+	ifneq ($(ARCH_ZCB),0)
+	ifneq ($(ARCH_C),0)
+		MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCB)
+	endif
+	endif
+	ifneq ($(ARCH_ZHINTP),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIHINTP)
+	endif
+	ifneq ($(ARCH_ZFHMIN),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFHMIN)
+	endif
+	ifneq ($(ARCH_ZAWRS),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZAWRS)
+	endif
+	ifneq ($(ARCH_ZKT),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZKT)
+	endif
+	ifneq ($(ARCH_ZFA),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFA)
+	endif
+	ifneq ($(ARCH_ZICOND),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZICOND)
+	endif
+	ifneq ($(ARCH_VFBF),0)
+	ifneq ($(ARCH_V),0)
+		MARCH_ALL := $(MARCH_ALL)$(MARCH_VFBF)
+	endif
+	endif
+	ifneq ($(ARCH_ZIMOP),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIMOP)
+	endif
+	ifneq ($(ARCH_ZCMOP),0)
+	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCMOP)
+	endif
+	ifneq ($(ARCH_V_CRYPTO),0)
+	ifneq ($(ARCH_V),0)
+		MARCH_ALL := $(MARCH_ALL)$(MARCH_V_CRYPTO)
+	endif
+	endif
+else ifeq ($(ARCH),arm)
+    MARCH_ALL := armv8-a
 endif
 
-CARCH = -march=$(MARCH_ALL)
+	CARCH = -march=$(MARCH_ALL)
 
 # Optimization options to compiler.
 COPT ?= -O2
@@ -202,7 +221,6 @@ LIB_DIR ?=
 
 ELF_FILE := ${RUN_DIR}/test.elf
 DIS_FILE := ${RUN_DIR}/test.asm
-ISS_FILE := ${RUN_DIR}/test.iss
 
 LIB_DIR_REALPATH := $(realpath $(LIB_DIR))
 LIB_SRCS := \
@@ -217,17 +235,31 @@ ENV_SRCS := \
 COMMON_DIR := $(MAKEFILE_DIR)/common
 COMMON_SRCS := \
 
+SOURCE_DIR := $(MAKEFILE_DIR)/source
+ifeq ($(ARCH), riscv)
+	SOURCE_SRCS := ${SOURCE_DIR}/*.c
+else ifeq ($(ARCH), arm)
+	SOURCE_SRCS :=
+endif
+
 FRAMEWORK_CFLAGS := \
 	-Werror \
 	-ffreestanding \
-	-mcmodel=medany \
+	-static \
 	-fno-builtin \
 	-I${FRAMEWORK_DIR} \
 	-I${COMMON_DIR} \
+	-I${SOURCE_DIR} \
 	-I${ENV_DIR_REALPATH} \
 	-I${LIB_DIR_REALPATH} \
 	-g \
 	-ggdb
+
+ifeq ($(ARCH),riscv)
+	FRAMEWORK_CFLAGS += -mcmodel=medany
+else ifeq ($(ARCH),arm)
+	FRAMEWORK_CFLAGS += -mcmodel=small
+endif
 
 # Additional flags for .S files
 ifeq ($(shell echo ${SRCS} | grep -E "\.S$$"),${SRCS})
@@ -240,12 +272,17 @@ OBJDUMP_FLAGS := \
 	--all-headers \
 	--demangle \
 	--disassemble-all \
-	--disassembler-options=no-aliases,numeric \
 	--full-contents \
 	--prefix-addresses \
 	--line-numbers \
 	--show-raw-insn \
 	--source
+
+ifeq ($(ARCH),riscv)
+	OBJDUMP_FLAGS += --disassembler-options=no-aliases,numeric
+else ifeq ($(ARCH),arm)
+	OBJDUMP_FLAGS += --disassembler-options=no-aliases
+endif
 
 #if given default LD
 LD_DEFAULT?=
@@ -268,17 +305,15 @@ endif
 ##############################################################################
 # Expansions
 
-COMPILE_EXP = "riscv64-unknown-elf-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} -o $@"
-DISM_EXP = "riscv64-unknown-elf-objdump ${OBJDUMP_FLAGS} $< > $@"
+COMPILE_EXP = "${CROSS_PREFIX}-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${SOURCE_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} -o $@"
+DISM_EXP = "${CROSS_PREFIX}-objdump ${OBJDUMP_FLAGS} $< > $@"
 
 ##############################################################################
 # Targets
 
 .PHONY: default setup test spike qemu clean
 
-
-
-default: compile spike qemu
+default: compile $(if $(SPIKE),spike) qemu
 
 setup: test
 	mkdir -p ${RUN_DIR}
@@ -289,15 +324,15 @@ ${ELF_FILE}: setup ${SRCS}
 	@echo ""
 	@echo ${COMPILE_EXP} > ${RUN_DIR}/compile_cmd_rerun.sh
 	@chmod u+x ${RUN_DIR}/compile_cmd_rerun.sh
-	${RISCV_PREFIX}-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} -o $@
+	${CROSS_PREFIX}-gcc ${FRAMEWORK_CFLAGS} ${CARCH} ${COPT} ${CFLAGS2} ${FRAMEWORK_SRCS} ${COMMON_SRCS} ${SOURCE_SRCS} ${ENV_SRCS} ${LIB_SRCS} ${LDFLAGS} -o $@
 
 ${DIS_FILE}: ${ELF_FILE}
 	@echo ""
 	@echo ${DISM_EXP} > ${RUN_DIR}/dism_cmd_rerun.sh
 	@chmod u+x ${RUN_DIR}/dism_cmd_rerun.sh
-	${RISCV_PREFIX}-objdump ${OBJDUMP_FLAGS} $< > $@
+	${CROSS_PREFIX}-objdump ${OBJDUMP_FLAGS} $< > $@
 	@echo "export DBG=${ELF_FILE}" > ${RUN_DIR}/temp_gdb_export.sh
-	@echo "${RISCV_PREFIX}-gdb --exec=${realpath ${ELF_FILE}} --symbols=${realpath ${ELF_FILE}}" >> ${RUN_DIR}/temp_gdb_export.sh
+	@echo "${CROSS_PREFIX}-gdb --exec=${realpath ${ELF_FILE}} --symbols=${realpath ${ELF_FILE}}" >> ${RUN_DIR}/temp_gdb_export.sh
 
 compile: ${ELF_FILE} ${DIS_FILE}
 	@echo ""
@@ -326,11 +361,11 @@ endif
 
 spike:
 	@echo ""
-	$(SPIKE) --isa=$(SPIKE_ISA) -l --log-commits ${PK} ${ELF_FILE} 1> ${RUN_DIR}/$(SPIKE)/$@.out 2> ${RUN_DIR}/$(SPIKE)/$@.err
+	$(SPIKE) --isa=$(SPIKE_ISA) -l --log-commits ${PK} ${ELF_FILE} 1> ${RUN_DIR}/$(SPIKE)/$@.out 2> ${RUN_DIR}/$(SPIKE)/$@.log
 
 qemu:
 	@echo ""
-	$(QEMU) ${ELF_FILE} > ${RUN_DIR}/$(QEMU)/$@.out
+	$(QEMU) ${ELF_FILE} -D 1> ${RUN_DIR}/$(QEMU)/$@.out 2> ${RUN_DIR}/$(QEMU)/$@.log
 
 clean:
 	rm -f  $(MAKEFILE_DIR)/temp.sh
