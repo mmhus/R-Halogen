@@ -24,7 +24,7 @@ ifeq ($(ARCH),riscv)
 else ifeq ($(ARCH),arm)
     CROSS_PREFIX := ${ARM_PREFIX}
     QEMU := qemu-aarch64
-	SPIKE :=
+    SPIKE :=
 endif
 
 # Project name
@@ -70,115 +70,115 @@ ARCH_V_CRYPTO        := 1
 # Architecture options to compiler.
 MARCH_ALL            :=
 ifeq ($(ARCH),riscv)
-	MARCH_RV             := rv64
-	MARCH_I              := i2p1
-	MARCH_M              := _m2p0
-	MARCH_A              := _a2p1
-	MARCH_F              := _f2p2
-	MARCH_D              := _d2p2
-	MARCH_C              := _c2p0
-	MARCH_V              := _v
-	MARCH_CBO            := _zicbom_zicbop_zicboz
-	MARCH_H              := _h1p0
-	MARCH_ZIFENCEI       := _zifencei
-	MARCH_B              := _zba2p0_zbb2p0_zbs2p0
-	MARCH_ZBC            := _zbc2p0
-	MARCH_ZCB            := _zcb
-	MARCH_ZIHINTP        := _zihintpause
-	MARCH_ZFHMIN         := _zfhmin
-	MARCH_ZAWRS          := _zawrs
-	MARCH_ZKT            := _zkt
-	MARCH_ZFA            := _zfa
-	MARCH_ZICOND         := _zicond
-	MARCH_VFBF           := _zvfbfmin_zvfbfwma
-	MARCH_ZIMOP          := _zimop
-	MARCH_ZCMOP          := _zcmop
-	MARCH_V_CRYPTO       := _zvknhb_zvkned_zvkg_zvbc_zvbb
-
-	MARCH_ALL := $(MARCH_RV)
-
-	ifneq ($(ARCH_I),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_I)
-	endif
-	ifneq ($(ARCH_M),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_M)
-	endif
-	ifneq ($(ARCH_A),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_A)
-	endif
-	ifneq ($(ARCH_F),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_F)
-	endif
-	ifneq ($(ARCH_D),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_D)
-	endif
-	ifneq ($(ARCH_C),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_C)
-	endif
-	ifneq ($(ARCH_V),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_V)
-	endif
-	ifneq ($(ARCH_H),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_H)
-	endif
-	ifneq ($(ARCH_CBO),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_CBO)
-	endif
-	ifneq ($(ARCH_ZIFENCEI),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIFENCEI)
-	endif
-	ifneq ($(ARCH_B),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_B)
-	endif
-	ifneq ($(ARCH_ZBC),0)
-	ifneq ($(ARCH_B),0)
-		MARCH_ALL := $(MARCH_ALL)$(MARCH_ZBC)
-	endif
-	endif
-	ifneq ($(ARCH_ZCB),0)
-	ifneq ($(ARCH_C),0)
-		MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCB)
-	endif
-	endif
-	ifneq ($(ARCH_ZHINTP),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIHINTP)
-	endif
-	ifneq ($(ARCH_ZFHMIN),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFHMIN)
-	endif
-	ifneq ($(ARCH_ZAWRS),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZAWRS)
-	endif
-	ifneq ($(ARCH_ZKT),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZKT)
-	endif
-	ifneq ($(ARCH_ZFA),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFA)
-	endif
-	ifneq ($(ARCH_ZICOND),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZICOND)
-	endif
-	ifneq ($(ARCH_VFBF),0)
-	ifneq ($(ARCH_V),0)
-		MARCH_ALL := $(MARCH_ALL)$(MARCH_VFBF)
-	endif
-	endif
-	ifneq ($(ARCH_ZIMOP),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIMOP)
-	endif
-	ifneq ($(ARCH_ZCMOP),0)
-	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCMOP)
-	endif
-	ifneq ($(ARCH_V_CRYPTO),0)
-	ifneq ($(ARCH_V),0)
-		MARCH_ALL := $(MARCH_ALL)$(MARCH_V_CRYPTO)
-	endif
-	endif
+    MARCH_RV             := rv64
+    MARCH_I              := i2p1
+    MARCH_M              := _m2p0
+    MARCH_A              := _a2p1
+    MARCH_F              := _f2p2
+    MARCH_D              := _d2p2
+    MARCH_C              := _c2p0
+    MARCH_V              := _v
+    MARCH_CBO            := _zicbom_zicbop_zicboz
+    MARCH_H              := _h1p0
+    MARCH_ZIFENCEI       := _zifencei
+    MARCH_B              := _zba2p0_zbb2p0_zbs2p0
+    MARCH_ZBC            := _zbc2p0
+    MARCH_ZCB            := _zcb
+    MARCH_ZIHINTP        := _zihintpause
+    MARCH_ZFHMIN         := _zfhmin
+    MARCH_ZAWRS          := _zawrs
+    MARCH_ZKT            := _zkt
+    MARCH_ZFA            := _zfa
+    MARCH_ZICOND         := _zicond
+    MARCH_VFBF           := _zvfbfmin_zvfbfwma
+    MARCH_ZIMOP          := _zimop
+    MARCH_ZCMOP          := _zcmop
+    MARCH_V_CRYPTO       := _zvknhb_zvkned_zvkg_zvbc_zvbb
+    
+    MARCH_ALL := $(MARCH_RV)
+    
+    ifneq ($(ARCH_I),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_I)
+    endif
+    ifneq ($(ARCH_M),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_M)
+    endif
+    ifneq ($(ARCH_A),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_A)
+    endif
+    ifneq ($(ARCH_F),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_F)
+    endif
+    ifneq ($(ARCH_D),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_D)
+    endif
+    ifneq ($(ARCH_C),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_C)
+    endif
+    ifneq ($(ARCH_V),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_V)
+    endif
+    ifneq ($(ARCH_H),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_H)
+    endif
+    ifneq ($(ARCH_CBO),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_CBO)
+    endif
+    ifneq ($(ARCH_ZIFENCEI),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIFENCEI)
+    endif
+    ifneq ($(ARCH_B),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_B)
+    endif
+    ifneq ($(ARCH_ZBC),0)
+    ifneq ($(ARCH_B),0)
+    	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZBC)
+    endif
+    endif
+    ifneq ($(ARCH_ZCB),0)
+    ifneq ($(ARCH_C),0)
+    	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCB)
+    endif
+    endif
+    ifneq ($(ARCH_ZHINTP),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIHINTP)
+    endif
+    ifneq ($(ARCH_ZFHMIN),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFHMIN)
+    endif
+    ifneq ($(ARCH_ZAWRS),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZAWRS)
+    endif
+    ifneq ($(ARCH_ZKT),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZKT)
+    endif
+    ifneq ($(ARCH_ZFA),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFA)
+    endif
+    ifneq ($(ARCH_ZICOND),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZICOND)
+    endif
+    ifneq ($(ARCH_VFBF),0)
+    ifneq ($(ARCH_V),0)
+    	MARCH_ALL := $(MARCH_ALL)$(MARCH_VFBF)
+    endif
+    endif
+    ifneq ($(ARCH_ZIMOP),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIMOP)
+    endif
+    ifneq ($(ARCH_ZCMOP),0)
+    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCMOP)
+    endif
+    ifneq ($(ARCH_V_CRYPTO),0)
+    ifneq ($(ARCH_V),0)
+    	MARCH_ALL := $(MARCH_ALL)$(MARCH_V_CRYPTO)
+    endif
+    endif
 else ifeq ($(ARCH),arm)
     MARCH_ALL := armv8-a
 endif
 
-	CARCH = -march=$(MARCH_ALL)
+CARCH = -march=$(MARCH_ALL)
 
 # Optimization options to compiler.
 COPT ?= -O2
@@ -237,9 +237,9 @@ COMMON_SRCS := \
 
 SOURCE_DIR := $(MAKEFILE_DIR)/source
 ifeq ($(ARCH), riscv)
-	SOURCE_SRCS := ${SOURCE_DIR}/*.c
+    SOURCE_SRCS := ${SOURCE_DIR}/*.c
 else ifeq ($(ARCH), arm)
-	SOURCE_SRCS :=
+    SOURCE_SRCS :=
 endif
 
 FRAMEWORK_CFLAGS := \
@@ -256,9 +256,9 @@ FRAMEWORK_CFLAGS := \
 	-ggdb
 
 ifeq ($(ARCH),riscv)
-	FRAMEWORK_CFLAGS += -mcmodel=medany
+    FRAMEWORK_CFLAGS += -mcmodel=medany
 else ifeq ($(ARCH),arm)
-	FRAMEWORK_CFLAGS += -mcmodel=small
+    FRAMEWORK_CFLAGS += -mcmodel=small
 endif
 
 # Additional flags for .S files
