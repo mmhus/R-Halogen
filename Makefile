@@ -98,81 +98,81 @@ ifeq ($(ARCH),riscv)
     MARCH_ALL := $(MARCH_RV)
     
     ifneq ($(ARCH_I),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_I)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_I)
     endif
     ifneq ($(ARCH_M),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_M)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_M)
     endif
     ifneq ($(ARCH_A),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_A)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_A)
     endif
     ifneq ($(ARCH_F),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_F)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_F)
     endif
     ifneq ($(ARCH_D),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_D)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_D)
     endif
     ifneq ($(ARCH_C),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_C)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_C)
     endif
     ifneq ($(ARCH_V),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_V)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_V)
     endif
     ifneq ($(ARCH_H),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_H)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_H)
     endif
     ifneq ($(ARCH_CBO),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_CBO)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_CBO)
     endif
     ifneq ($(ARCH_ZIFENCEI),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIFENCEI)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIFENCEI)
     endif
     ifneq ($(ARCH_B),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_B)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_B)
     endif
     ifneq ($(ARCH_ZBC),0)
-    ifneq ($(ARCH_B),0)
-    	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZBC)
-    endif
+        ifneq ($(ARCH_B),0)
+            MARCH_ALL := $(MARCH_ALL)$(MARCH_ZBC)
+        endif
     endif
     ifneq ($(ARCH_ZCB),0)
-    ifneq ($(ARCH_C),0)
-    	MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCB)
-    endif
+        ifneq ($(ARCH_C),0)
+            MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCB)
+        endif
     endif
     ifneq ($(ARCH_ZHINTP),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIHINTP)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIHINTP)
     endif
     ifneq ($(ARCH_ZFHMIN),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFHMIN)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFHMIN)
     endif
     ifneq ($(ARCH_ZAWRS),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZAWRS)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZAWRS)
     endif
     ifneq ($(ARCH_ZKT),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZKT)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZKT)
     endif
     ifneq ($(ARCH_ZFA),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFA)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZFA)
     endif
     ifneq ($(ARCH_ZICOND),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZICOND)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZICOND)
     endif
     ifneq ($(ARCH_VFBF),0)
-    ifneq ($(ARCH_V),0)
-    	MARCH_ALL := $(MARCH_ALL)$(MARCH_VFBF)
-    endif
+        ifneq ($(ARCH_V),0)
+            MARCH_ALL := $(MARCH_ALL)$(MARCH_VFBF)
+        endif
     endif
     ifneq ($(ARCH_ZIMOP),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIMOP)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZIMOP)
     endif
     ifneq ($(ARCH_ZCMOP),0)
-    MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCMOP)
+        MARCH_ALL := $(MARCH_ALL)$(MARCH_ZCMOP)
     endif
     ifneq ($(ARCH_V_CRYPTO),0)
-    ifneq ($(ARCH_V),0)
-    	MARCH_ALL := $(MARCH_ALL)$(MARCH_V_CRYPTO)
-    endif
+        ifneq ($(ARCH_V),0)
+            MARCH_ALL := $(MARCH_ALL)$(MARCH_V_CRYPTO)
+        endif
     endif
 else ifeq ($(ARCH),arm)
     MARCH_ALL := armv8-a
