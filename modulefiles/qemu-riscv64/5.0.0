@@ -1,0 +1,29 @@
+# Copyright 2024 10xEngineers
+
+#%Module1.0
+#####################################################################
+## Modulefile to load QEMU 5.0.0 version
+#####################################################################
+proc ModulesHelp { } {
+    global version
+    puts stderr "This module loads QEMU 5.0.0 for virtualization and emulation."
+}
+
+module-whatis "Loads QEMU 5.0.0 for virtualization and emulation."
+
+# Define the version
+set qemu_version "5.0.0"
+
+# Define the installation directory
+set qemu_dir "/usr/local"
+
+# Update PATH environment variable
+prepend-path PATH "$qemu_dir/bin"
+
+# Notify the user
+if { [module-info mode unload] } {
+    puts stderr "Unloaded QEMU $qemu_version for virtualization and emulation."
+} else {
+    puts stderr "Loaded QEMU $qemu_version for virtualization and emulation."
+}
+
