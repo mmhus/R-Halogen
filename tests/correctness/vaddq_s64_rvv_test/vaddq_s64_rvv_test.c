@@ -1,17 +1,17 @@
 // Copyright 2024 10xEngineers
 
-#include "../../../common/print.h"
+#include "common_utilities.h"
 
-#ifdef ARM_NEON
+#if defined(ARM_NEON)
     #include <arm_neon.h>
+#elif defined(RISCV_VECTOR)
+    #include "rhal_base.h"
 #else
-#ifdef RISCV_VECTOR
-    #include "../../../common/rhal_base.h"
-#endif
+    #error "Unsupported architecture. Please define either ARM_NEON or RISCV_VECTOR."
 #endif
 
-// Function to run test cases with a given func_ptr
-void run_test_cases(void (*func_ptr)(int64_t*, int64_t*, int, int64_t*)) {
+// Function to run test cases with a given vect_add
+void run_test_cases(void (*vect_add)(int64_t*, int64_t*, int, int64_t*)) {
     int64_t test_cases[][2] = {
         {1, 2},                        // Regular positive numbers
         {0, 0},                        // All zeros
@@ -30,12 +30,12 @@ void run_test_cases(void (*func_ptr)(int64_t*, int64_t*, int, int64_t*)) {
         int64_t b[2] = {1, 2};
         int64_t result[2];
 
-        func_ptr(a, b, 2, result);
-        print_results(result, 2, "int64_t");
+        vect_add(a, b, 2, result);
+        print_results(result, 2, INT64);
     }
 }
 
-#ifdef ARM_NEON
+#if defined(ARM_NEON)
 // ARM Neon-specific implementation
 void vaddq_s64_neon(int64_t *a, int64_t *b, int size, int64_t *result) {
     int64x2_t x = vld1q_s64(a);
@@ -47,9 +47,8 @@ void vaddq_s64_neon(int64_t *a, int64_t *b, int size, int64_t *result) {
 void run_tests_neon() {
     run_test_cases(vaddq_s64_neon);
 }
-#endif
 
-#ifdef RISCV_VECTOR
+#elif defined(RISCV_VECTOR)
 // RISC-V Vector-specific implementation
 void vaddq_s64_rvvector(int64_t *a, int64_t *b, int size, int64_t *result) {
     int64x2_t x = __riscv_vle64_v_i64m1(a, size);
@@ -64,11 +63,12 @@ void run_tests_rvv() {
 #endif
 
 int main() {
-    #ifdef RISCV_VECTOR
+     #if defined(RISCV_VECTOR)
         run_tests_rvv();
-    #endif
-    #ifdef ARM_NEON
+    #elif defined(ARM_NEON)
         run_tests_neon();
+    #else
+        #error "Unsupported architecture. Please define either ARM_NEON or RISCV_VECTOR."
     #endif
     return 0;
 }

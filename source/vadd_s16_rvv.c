@@ -1,6 +1,6 @@
 // Copyright 2024 10xEngineers
 
-#include "../common/rhal_base.h"
+#include "rhal_base.h"
 
 /**
  * @brief Adds two 64-bit vectors of 16-bit signed integers element-wise.
@@ -15,5 +15,5 @@
  * @return int16x4_t The result of the element-wise addition, returned as an 16-bit signed integer vector.
  */
 int16x4_t vadd_s16_rvv(int16x4_t a, int16x4_t b) {
-    return __riscv_vadd_vv_i16m1(a, b, 4);
+    return __riscv_vadd_vv_i16m1(a, b, VLEN_4);
 }

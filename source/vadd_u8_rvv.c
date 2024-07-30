@@ -1,6 +1,6 @@
 // Copyright 2024 10xEngineers
 
-#include "../common/rhal_base.h"
+#include "rhal_base.h"
 
 /**
  * @brief Adds two 64-bit vectors of 8-bit unsigned integers element-wise.
@@ -15,5 +15,5 @@
  * @return uint8x8_t The result of the element-wise addition, returned as an 8-bit unsigned integer vector.
  */
 uint8x8_t vadd_u8_rvv(uint8x8_t a, uint8x8_t b) {
-    return __riscv_vadd_vv_u8m1(a, b, 8);
+    return __riscv_vadd_vv_u8m1(a, b, VLEN_8);
 }

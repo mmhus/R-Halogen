@@ -1,6 +1,6 @@
 // Copyright 2024 10xEngineers
 
-#include "../common/rhal_base.h"
+#include "rhal_base.h"
 
 /**
  * @brief Adds two 128-bit vectors of 8-bit signed integers element-wise.
@@ -15,5 +15,5 @@
  * @return int8x16_t The result of the element-wise addition, returned as an 8-bit signed integer vector.
  */
 int8x16_t vaddq_s8_rvv(int8x16_t a, int8x16_t b) {
-    return __riscv_vadd_vv_i8m1(a, b, 16);
+    return __riscv_vadd_vv_i8m1(a, b, VLEN_16);
 }

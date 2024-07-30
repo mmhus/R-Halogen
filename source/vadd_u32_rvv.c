@@ -1,6 +1,6 @@
 // Copyright 2024 10xEngineers
 
-#include "../common/rhal_base.h"
+#include "rhal_base.h"
 
 /**
  * @brief Adds two 64-bit vectors of 32-bit unsigned integers element-wise.
@@ -15,5 +15,5 @@
  * @return uint32x2_t The result of the element-wise addition, returned as an 32-bit unsigned integer vector.
  */
 uint32x2_t vadd_u32_rvv(uint32x2_t a, uint32x2_t b) {
-    return __riscv_vadd_vv_u32m1(a, b, 2);
+    return __riscv_vadd_vv_u32m1(a, b, VLEN_2);
 }

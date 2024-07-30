@@ -1,17 +1,17 @@
 // Copyright 2024 10xEngineers
 
-#include "../../../common/print.h"
+#include "common_utilities.h"
 
-#ifdef ARM_NEON
+#if defined(ARM_NEON)
     #include <arm_neon.h>
+#elif defined(RISCV_VECTOR)
+    #include "rhal_base.h"
 #else
-#ifdef RISCV_VECTOR
-    #include "../../../common/rhal_base.h"
-#endif
+    #error "Unsupported architecture. Please define either ARM_NEON or RISCV_VECTOR."
 #endif
 
-// Function to run test cases with a given func_ptr
-void run_test_cases(void (*func_ptr)(uint32_t*, uint32_t*, int, uint32_t*)) {
+// Function to run test cases with a given vect_add
+void run_test_cases(void (*vect_add)(uint32_t*, uint32_t*, int, uint32_t*)) {
     uint32_t test_cases[][2] = {
         {1, 2},                                  // Regular positive numbers
         {0, 0},                                  // All zeros
@@ -30,12 +30,12 @@ void run_test_cases(void (*func_ptr)(uint32_t*, uint32_t*, int, uint32_t*)) {
         uint32_t b[2] = {1, 2};
         uint32_t result[2];
 
-        func_ptr(a, b, 2, result);
-        print_results(result, 2, "uint32_t");
+        vect_add(a, b, 2, result);
+        print_results(result, 2, UINT32);
     }
 }
 
-#ifdef ARM_NEON
+#if defined(ARM_NEON)
 // ARM Neon-specific implementation
 void vadd_u32_neon(uint32_t *a, uint32_t *b, int size, uint32_t *result) {
     uint32x2_t x = vld1_u32(a);
@@ -47,9 +47,8 @@ void vadd_u32_neon(uint32_t *a, uint32_t *b, int size, uint32_t *result) {
 void run_tests_neon() {
     run_test_cases(vadd_u32_neon);
 }
-#endif
 
-#ifdef RISCV_VECTOR
+#elif defined(RISCV_VECTOR)
 // RISC-V Vector-specific implementation
 void vadd_u32_rvvector(uint32_t *a, uint32_t *b, int size, uint32_t *result) {
     uint32x2_t x = __riscv_vle32_v_u32m1(a, size);
@@ -64,11 +63,12 @@ void run_tests_rvv() {
 #endif
 
 int main() {
-    #ifdef RISCV_VECTOR
+     #if defined(RISCV_VECTOR)
         run_tests_rvv();
-    #endif
-    #ifdef ARM_NEON
+    #elif defined(ARM_NEON)
         run_tests_neon();
+    #else
+        #error "Unsupported architecture. Please define either ARM_NEON or RISCV_VECTOR."
     #endif
     return 0;
 }

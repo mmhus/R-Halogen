@@ -1,6 +1,6 @@
 // Copyright 2024 10xEngineers
 
-#include "../common/rhal_base.h"
+#include "rhal_base.h"
 
 /**
  * @brief Adds two 64-bit vectors of 64-bit unsigned integer element-wise.
@@ -15,5 +15,5 @@
  * @return uint64x1_t The result of the element-wise addition, returned as an 64-bit unsigned integer vector.
  */
 uint64x1_t vadd_u64_rvv(uint64x1_t a, uint64x1_t b) {
-    return __riscv_vadd_vv_u64m1(a, b, 1);
+    return __riscv_vadd_vv_u64m1(a, b, VLEN_1);
 }

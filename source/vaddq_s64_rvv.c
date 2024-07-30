@@ -1,6 +1,6 @@
 // Copyright 2024 10xEngineers
 
-#include "../common/rhal_base.h"
+#include "rhal_base.h"
 
 /**
  * @brief Adds two 128-bit vectors of 64-bit signed integer element-wise.
@@ -15,5 +15,5 @@
  * @return int64x2_t The result of the element-wise addition, returned as an 64-bit signed integer vector.
  */
 int64x2_t vaddq_s64_rvv(int64x2_t a, int64x2_t b) {
-    return __riscv_vadd_vv_i64m1(a, b, 2);
+    return __riscv_vadd_vv_i64m1(a, b, VLEN_2);
 }

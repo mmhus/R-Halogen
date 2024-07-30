@@ -1,17 +1,17 @@
 // Copyright 2024 10xEngineers
 
-#include "../../../common/print.h"
+#include "common_utilities.h"
 
-#ifdef ARM_NEON
+#if defined(ARM_NEON)
     #include <arm_neon.h>
+#elif defined(RISCV_VECTOR)
+    #include "rhal_base.h"
 #else
-#ifdef RISCV_VECTOR
-    #include "../../../common/rhal_base.h"
-#endif
+    #error "Unsupported architecture. Please define either ARM_NEON or RISCV_VECTOR."
 #endif
 
-// Function to run test cases with a given func_ptr
-void run_test_cases(void (*func_ptr)(int16_t*, int16_t*, int, int16_t*)) {
+// Function to run test cases with a given vect_add
+void run_test_cases(void (*vect_add)(int16_t*, int16_t*, int, int16_t*)) {
     int16_t test_cases[][8] = {
         {1, 2, 3, 4, 5, 6, 7, 8},                   // Regular positive numbers
         {0, 0, 0, 0, 0, 0, 0, 0},                   // All zeros
@@ -30,12 +30,12 @@ void run_test_cases(void (*func_ptr)(int16_t*, int16_t*, int, int16_t*)) {
         int16_t b[8] = {1, 2, 3, 4, 5, 6, 7, 8};
         int16_t result[8];
 
-        func_ptr(a, b, 8, result);
-        print_results(result, 8, "int16_t");
+        vect_add(a, b, 8, result);
+        print_results(result, 8, INT16);
     }
 }
 
-#ifdef ARM_NEON
+#if defined(ARM_NEON)
 // ARM Neon-specific implementation
 void vaddq_s16_neon(int16_t *a, int16_t *b, int size, int16_t *result) {
     int16x8_t x = vld1q_s16(a);
@@ -47,9 +47,8 @@ void vaddq_s16_neon(int16_t *a, int16_t *b, int size, int16_t *result) {
 void run_tests_neon() {
     run_test_cases(vaddq_s16_neon);
 }
-#endif
 
-#ifdef RISCV_VECTOR
+#elif defined(RISCV_VECTOR)
 // RISC-V Vector-specific implementation
 void vaddq_s16_rvvector(int16_t *a, int16_t *b, int size, int16_t *result) {
     int16x8_t x = __riscv_vle16_v_i16m1(a, size);
@@ -64,11 +63,12 @@ void run_tests_rvv() {
 #endif
 
 int main() {
-    #ifdef RISCV_VECTOR
+     #if defined(RISCV_VECTOR)
         run_tests_rvv();
-    #endif
-    #ifdef ARM_NEON
+    #elif defined(ARM_NEON)
         run_tests_neon();
+    #else
+        #error "Unsupported architecture. Please define either ARM_NEON or RISCV_VECTOR."
     #endif
     return 0;
 }

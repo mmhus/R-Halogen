@@ -30,7 +30,7 @@ else ifeq ($(ARCH),arm)
 endif
 
 # Project name
-PROJECT := R-Halogen
+# PROJECT := R-Halogen
 
 # Source file(s)
 SRCS :=
@@ -235,13 +235,14 @@ ENV_SRCS := \
 	$(wildcard $(ENV_DIR_REALPATH)/*.S)
 
 COMMON_DIR := $(MAKEFILE_DIR)/common
-COMMON_SRCS := \
+COMMON_INCLUDE_DIR := $(COMMON_DIR)/include
+COMMON_SRCS := $(COMMON_DIR)/src/*.c
 
 SOURCE_DIR := $(MAKEFILE_DIR)/source
 ifeq ($(ARCH), riscv)
     SOURCE_SRCS := ${SOURCE_DIR}/*.c
 else ifeq ($(ARCH), arm)
-    SOURCE_SRCS := ${SOURCE_DIR}/print.c
+    SOURCE_SRCS := 
 endif
 
 FRAMEWORK_CFLAGS := \
@@ -249,8 +250,8 @@ FRAMEWORK_CFLAGS := \
 	-ffreestanding \
 	-static \
 	-fno-builtin \
-	-I${FRAMEWORK_DIR} \
 	-I${COMMON_DIR} \
+    -I${COMMON_INCLUDE_DIR} \
 	-I${SOURCE_DIR} \
 	-I${ENV_DIR_REALPATH} \
 	-I${LIB_DIR_REALPATH} \

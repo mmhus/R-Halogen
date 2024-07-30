@@ -9,6 +9,13 @@ extern "C" {
 
 #include <riscv_vector.h>
 
+/* Define macros for different vector length (vl) */
+#define VLEN_1  1
+#define VLEN_2  2
+#define VLEN_4  4
+#define VLEN_8  8
+#define VLEN_16 16
+
 /* 64-bit vector register length */
 typedef vint8m1_t int8x8_t;
 typedef vint16m1_t int16x4_t;
