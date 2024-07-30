@@ -251,7 +251,7 @@ FRAMEWORK_CFLAGS := \
 	-static \
 	-fno-builtin \
 	-I${COMMON_DIR} \
-    -I${COMMON_INCLUDE_DIR} \
+	-I${COMMON_INCLUDE_DIR} \
 	-I${SOURCE_DIR} \
 	-I${ENV_DIR_REALPATH} \
 	-I${LIB_DIR_REALPATH} \
