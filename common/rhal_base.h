@@ -31,6 +31,10 @@ typedef vint8m1_t int8x16_t;
 typedef vint16m1_t int16x8_t;
 typedef vint32m1_t int32x4_t;
 typedef vint64m1_t int64x2_t;
+typedef vuint8m1_t uint8x16_t;
+typedef vuint16m1_t uint16x8_t;
+typedef vuint32m1_t uint32x4_t;
+typedef vuint64m1_t uint64x2_t;
 
 
 /* vadd */
@@ -49,6 +53,10 @@ uint16x4_t vadd_u16_rvv(uint16x4_t a, uint16x4_t b);
 uint32x2_t vadd_u32_rvv(uint32x2_t a, uint32x2_t b);
 uint64x1_t vadd_u64_rvv(uint64x1_t a, uint64x1_t b);
 
+uint8x16_t vaddq_u8_rvv(uint8x16_t a, uint8x16_t b);
+uint16x8_t vaddq_u16_rvv(uint16x8_t a, uint16x8_t b);
+uint32x4_t vaddq_u32_rvv(uint32x4_t a, uint32x4_t b);
+uint64x2_t vaddq_u64_rvv(uint64x2_t a, uint64x2_t b);
 
 #ifdef __cplusplus
 }
