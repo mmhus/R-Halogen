@@ -1,6 +1,6 @@
 // Copyright 2024 10xEngineers
 
-#include "../common/rhal_base.h"
+#include "rhal_base.h"
 
 /**
  * @brief Subtracts two 64-bit vectors of 32-bit signed integers element-wise.

@@ -7,7 +7,6 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
 #include <riscv_vector.h>
 
 /* Define macros for different vector length (vl) */
