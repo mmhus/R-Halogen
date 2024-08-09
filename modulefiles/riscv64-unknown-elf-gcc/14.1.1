@@ -1,0 +1,37 @@
+# Copyright 2024 10xEngineers
+
+#%Module1.0
+#####################################################################
+## modulefile to load a 14.1.1 version of riscv-toochain gcc.
+#####################################################################
+proc ModulesHelp { } {
+    global version
+    puts stderr "This module loads riscv64-unknown-elf-gcc 14.1.1 for RISC-V development."
+}
+
+module-whatis "Loads riscv64-unknown-elf-gcc 14.1.1 for RISC-V development."
+
+# Define the version
+set gcc_version "14.1.1"
+
+# Define the installation directory
+set gcc_dir "/opt/riscv-toolchain/gcc-14/riscv"
+
+# Update PATH environment variable
+prepend-path PATH "$gcc_dir/bin"
+
+# Update LD_LIBRARY_PATH environment variable
+prepend-path LD_LIBRARY_PATH "$gcc_dir/lib"
+
+# Update MANPATH environment variable
+prepend-path MANPATH "$gcc_dir/share/man"
+
+# Define a procedure for loading and unloading the module
+if { [module-info mode unload] } {
+    # Notify the user
+    puts stderr "Unloaded riscv64-unknown-elf-gcc $gcc_version for RISC-V development."
+} else {
+    # Notify the user
+    puts stderr "Loaded riscv64-unknown-elf-gcc $gcc_version for RISC-V development."
+}
+
