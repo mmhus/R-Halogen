@@ -16,6 +16,13 @@ tests=(
     "vadd_u16_rvv_test"
     "vadd_u32_rvv_test"
     "vadd_u64_rvv_test"
+<<<<<<< HEAD
+    "vaddq_u8_rvv_test"
+    "vaddq_u16_rvv_test"
+    "vaddq_u32_rvv_test"
+    "vaddq_u64_rvv_test"
+=======
+>>>>>>> 08892b708c607b5a555ca3d8b10cb8116ced4232
 )
 
 # Ensure the script exits on errors or undefined variables
@@ -47,14 +54,14 @@ failed_tests=()
 # Execute each test
 for test in "${tests[@]}"; do
     # Run the RISC-V command
-    if ! make ARCH=riscv SUBD=riscv SRCS=tests/correctness/"${test}"/"${test}".c; then
+    if ! make ARCH=riscv TARGET=qemu-riscv64 SUBD=riscv SRCS=tests/correctness/"${test}"/"${test}".c; then
         echo -e "${test}: ${RED}RISC-V compilation failed${NOCOLOR}" | tee -a "$log_file"
         failed_tests+=("${test}")
         continue
     fi
 
     # Run the ARM command
-    if ! make ARCH=arm SUBD=arm SRCS=tests/correctness/"${test}"/"${test}".c; then
+    if ! make ARCH=arm TARGET=qemu-aarch64 SUBD=arm SRCS=tests/correctness/"${test}"/"${test}".c; then
         echo -e "${test}: ${RED}ARM compilation failed${NOCOLOR}" | tee -a "$log_file"
         failed_tests+=("${test}")
         continue
