@@ -24,6 +24,8 @@ ifeq ($(ARCH),riscv)
     ifeq ($(TARGET),qemu-riscv64)
         CROSS_PREFIX := ${RISCV_PREFIX}
         QEMU := qemu-riscv64
+    else ifeq ($(TARGET),spike)
+        CROSS_PREFIX := ${RISCV_PREFIX}
         SPIKE := spike
         SPIKE_ISA ?= rv64imafdcv_zba_zbb_zbc_zbs
         PK := pk
@@ -264,7 +266,7 @@ FRAMEWORK_CFLAGS := \
 	-static \
 	-fno-builtin \
 	-I${COMMON_DIR} \
-    -I${COMMON_INCLUDE_DIR} \
+	-I${COMMON_INCLUDE_DIR} \
 	-I${SOURCE_DIR} \
 	-I${ENV_DIR_REALPATH} \
 	-I${LIB_DIR_REALPATH} \
@@ -331,7 +333,9 @@ DISM_EXP = "${CROSS_PREFIX}-objdump ${OBJDUMP_FLAGS} $< > $@"
 
 # Default target based on TARGET variable
 ifeq ($(TARGET),qemu-riscv64)
-default: compile $(if $(SPIKE),spike) qemu
+default: compile  qemu
+else ifeq ($(TARGET),spike)
+default: compile spike
 else ifeq ($(TARGET),qemu-aarch64)
 default: compile qemu
 else ifeq ($(TARGET),bpif3)
@@ -345,8 +349,9 @@ endif
 setup: test
 	mkdir -p ${RUN_DIR}
 ifeq ($(TARGET),qemu-riscv64)
-	mkdir -p ${RUN_DIR}/${SPIKE}
 	mkdir -p ${RUN_DIR}/${QEMU}
+else ifeq ($(TARGET),spike)
+	mkdir -p ${RUN_DIR}/${SPIKE}
 else ifeq ($(TARGET),qemu-aarch64)
 	mkdir -p ${RUN_DIR}/${QEMU}
 else ifeq ($(TARGET),bpif3)

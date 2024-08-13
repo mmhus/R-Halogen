@@ -11,6 +11,7 @@ usage() {
     echo "Possible targets:"
     echo "  qemu-riscv64   - Run tests on QEMU RISC-V emulator"
     echo "  qemu-aarch64   - Run tests on QEMU ARM emulator"
+    echo "  spike          - Run tests on Spike Simulator"
     echo "  bpif3          - Run tests on Banana Pi F3"
     echo "  raspi4         - Run tests on Raspberry Pi 4"
     exit 1
@@ -48,7 +49,7 @@ tests=(
 log_file="performance_results_${TARGET}.csv"
 
 # Clear the log file if it exists and write the header
-if [[ "$TARGET" == "qemu-riscv64" || "$TARGET" == "bpif3" ]]; then
+if [[ "$TARGET" == "qemu-riscv64" || "$TARGET" == "spike" || "$TARGET" == "bpif3" ]]; then
     echo "testname,RISC-V (us)" > "$log_file"
 elif [[ "$TARGET" == "qemu-aarch64" || "$TARGET" == "raspi4" ]]; then
     echo "testname,ARM (us)" > "$log_file"
@@ -65,6 +66,19 @@ for test in "${tests[@]}"; do
 
         # Define the output files
         riscv_out="RUN/tests/performance/${test}/riscv/${TARGET}/qemu.out"
+
+        # Collect average performance data from the output files
+        riscv_time=$(grep "RISC-V vector function" "$riscv_out" | awk '{print $6}' | awk '{count+=$1} END{print count/NR}')
+
+        # Write the results to the log file
+        echo -e "${test},${riscv_time}" | tee -a "$log_file"
+
+    elif [[ "$TARGET" == "spike" ]]; then
+        # Run the RISC-V command
+        make ARCH=riscv TARGET="${TARGET}" SUBD=riscv SRCS=tests/performance/"${test}"/"${test}".c
+
+        # Define the output files
+        riscv_out="RUN/tests/performance/${test}/riscv/${TARGET}/${TARGET}.out"
 
         # Collect average performance data from the output files
         riscv_time=$(grep "RISC-V vector function" "$riscv_out" | awk '{print $6}' | awk '{count+=$1} END{print count/NR}')
