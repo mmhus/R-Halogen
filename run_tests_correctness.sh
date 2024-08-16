@@ -71,7 +71,7 @@ for i in "${!tests[@]}"; do
 
     elif [[ "$TARGET" == "spike" ]]; then
         # Run the RISC-V command
-        make ARCH=riscv TARGET="${TARGET}" SUBD=riscv SRCS=tests/correctness/"${test}"/"${test}".c
+        make PK=/home/jenkins_user/runner_dir/workspace/R-Halogen/riscv-pk/build/riscv64-unknown-elf/bin/pk ARCH=riscv TARGET="${TARGET}" SUBD=riscv SRCS=tests/correctness/"${test}"/"${test}".c
 
         # Define the output files
         riscv_out="RUN/tests/correctness/${test}/riscv/${TARGET}/${TARGET}.out"

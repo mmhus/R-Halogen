@@ -1,162 +1,223 @@
 parallel(
-    'Run Tests on bpif3 (Banana Pi F3)': {
-        node('J-BPF3-1') {
-            stage('Clean Workspace on bpif3') {
-                cleanWs()
-            }
-            stage('Clone Repository on bpif3') {
-                // Checkout the SCM (Git repository)
-                checkout scm
-            }
-            stage('Run Correctness and Performance Tests on bpif3') {
-                parallel(
-                    'Run Correctness Tests': {
+    'Run Correctness Tests on All Targets': {
+        parallel(
+            'Run Correctness Tests on bpif3 (Banana Pi F3)': {
+                node('J-BPF3-1') {
+                    stage('Clean Workspace on bpif3') {
+                        cleanWs()
+                    }
+                    stage('Clone Repository on bpif3') {
+                        checkout scm
+                    }
+                    stage('Run Correctness Tests on bpif3') {
                         sh '''#!/bin/bash
                             ./run_tests_correctness.sh bpif3
                         '''
-                    },
-                    'Run Performance Tests': {
+                    }
+                    stage('Make Clean on bpif3') {
                         sh '''#!/bin/bash
-                            ./run_tests_performance.sh bpif3
+                            make clean
                         '''
                     }
-                )
-            }
-            stage('Archive and Stash Results from bpif3') {
-                // Archive the performance and correctness results from Banana Pi F3
-                // archiveArtifacts artifacts: 'performance_results_bpif3.csv,correctness_results_bpif3.csv', allowEmptyArchive: true
-                // Stash the results for use in another stage
-                stash includes: 'performance_results_bpif3.csv,correctness_results_bpif3.csv', name: 'bpif3-results'
-            }
-        }
-    },
-    'Run Tests on raspi4 (Raspberry Pi 4)': {
-        node('J-RASP4-1') {
-            stage('Clean Workspace on raspi4') {
-                cleanWs()
-            }
-            stage('Clone Repository on raspi4') {
-                // Checkout the SCM (Git repository)
-                checkout scm
-            }
-            stage('Run Correctness and Performance Tests on raspi4') {
-                parallel(
-                    'Run Correctness Tests': {
+                    stage('Stash Correctness Results from bpif3') {
+                        stash includes: 'correctness_results_bpif3.csv', name: 'bpif3-correctness-results'
+                    }
+                }
+            },
+            'Run Correctness Tests on raspi4 (Raspberry Pi 4)': {
+                node('J-RASP4-1') {
+                    stage('Clean Workspace on raspi4') {
+                        cleanWs()
+                    }
+                    stage('Clone Repository on raspi4') {
+                        checkout scm
+                    }
+                    stage('Run Correctness Tests on raspi4') {
                         sh '''#!/bin/bash
                             ./run_tests_correctness.sh raspi4
                         '''
-                    },
-                    'Run Performance Tests': {
+                    }
+                    stage('Make Clean on raspi4') {
                         sh '''#!/bin/bash
-                            ./run_tests_performance.sh raspi4
+                            make clean
                         '''
                     }
-                )
-            }
-            stage('Archive and Stash Results from raspi4') {
-                // Archive the performance and correctness results from Raspberry Pi 4
-                // archiveArtifacts artifacts: 'performance_results_raspi4.csv,correctness_results_raspi4.csv', allowEmptyArchive: true
-                // Stash the results for use in another stage
-                stash includes: 'performance_results_raspi4.csv,correctness_results_raspi4.csv', name: 'raspi4-results'
-            }
-        }
-    },
-    'Run Tests on x86 Machine (qemu-riscv64, qemu-aarch64)': {
-        node('J-QMU-1') {
-            stage('Clean Workspace on x86 Machine') {
-                cleanWs()
-            }
-            stage('Clone Repository on x86 Machine') {
-                // Checkout the SCM (Git repository)
-                checkout scm
-            }
-            stage('Run Tests on qemu-riscv64 and qemu-aarch64') {
-                parallel(
-                    'Run Correctness and Performance Tests on qemu-riscv64': {
+                    stage('Stash Correctness Results from raspi4') {
+                        stash includes: 'correctness_results_raspi4.csv', name: 'raspi4-correctness-results'
+                    }
+                }
+            },
+            'Run Correctness Tests on x86 Machine (qemu-riscv64, qemu-aarch64, spike)': {
+                node('J-QMU-1') {
+                    stage('Clean Workspace on x86 Machine') {
+                        cleanWs()
+                    }
+                    stage('Clone Repository on x86 Machine') {
+                        checkout scm
+                    }
+                    stage('Configuring riscv-pk'){
+                        sh '''#!/bin/bash -l
+                            source "$MODULE_INIT"
+                            module load riscv64-gnu-glibc/02022024
+                            module load spike/1.1.1-dev
+                            module load riscv64-gnu-elf/02022024
+                            git clone https://github.com/riscv-software-src/riscv-pk.git
+                            cd riscv-pk
+                            mkdir build
+                            cd build
+                            ../configure --prefix=$(pwd) --host=riscv64-unknown-elf
+                            make
+                            make install
+                            cd ../..
+                        '''
+                    }
+                    stage('Run Correctness Tests on qemu-riscv64, qemu-aarch64, spike') {
                         parallel(
-                            'Run Correctness Tests': {
+                            'Run Correctness Tests on qemu-riscv64': {
                                 sh '''#!/bin/bash -l
                                     source "$MODULE_INIT"
                                     module load riscv64-gnu-glibc/02022024
                                     ./run_tests_correctness.sh qemu-riscv64
                                 '''
                             },
-                            'Run Performance Tests': {
-                                sh '''#!/bin/bash -l
-                                    source "$MODULE_INIT"
-                                    module load riscv64-gnu-glibc/02022024
-                                    ./run_tests_performance.sh qemu-riscv64
-                                '''
-                            }
-                        )
-                    },
-                    'Run Correctness and Performance Tests on qemu-aarch64': {
-                        parallel(
-                            'Run Correctness Tests': {
+                            'Run Correctness Tests on qemu-aarch64': {
                                 sh '''#!/bin/bash -l
                                     source "$MODULE_INIT"
                                     module load gcc-aarch64-none-linux-gnu/13.3.rel1
                                     ./run_tests_correctness.sh qemu-aarch64
                                 '''
                             },
-                            'Run Performance Tests': {
+                            'Run Correctness Tests on spike': {
+                                sh '''#!/bin/bash -l
+                                    source "$MODULE_INIT"
+                                    module load riscv64-gnu-glibc/02022024
+                                    module load spike/1.1.1-dev
+                                    ./run_tests_correctness.sh spike
+                                '''
+                            }
+                        )
+                    }
+                    stage('Make Clean on x86 Machine') {
+                        sh '''#!/bin/bash
+                            make clean
+                        '''
+                    }
+                }
+            }
+        )
+    }
+)
+
+node('J-QMU-1') {
+    stage('Unstash Correctness Results from bpif3 and raspi4') {
+        unstash 'bpif3-correctness-results'
+        unstash 'raspi4-correctness-results'
+    }
+    stage('Generate Correctness Comparison Across Targets') {
+        sh '''#!/bin/bash
+            ./correctness_comparison_results.sh
+        '''
+    }
+    stage('Archive Correctness Results') {
+        archiveArtifacts artifacts: 'correctness_results.csv', allowEmptyArchive: true
+    }
+}
+
+parallel(
+    'Run Performance Tests on All Targets': {
+        parallel(
+            'Run Performance Tests on bpif3 (Banana Pi F3)': {
+                node('J-BPF3-1') {
+                    stage('Run Performance Tests on bpif3') {
+                        sh '''#!/bin/bash
+                            ./run_tests_performance.sh bpif3
+                        '''
+                    }
+                    stage('Make Clean on bpif3') {
+                        sh '''#!/bin/bash
+                            make clean
+                        '''
+                    }
+                    stage('Stash Performance Results from bpif3') {
+                        stash includes: 'performance_results_bpif3.csv', name: 'bpif3-performance-results'
+                    }
+                }
+            },
+            'Run Performance Tests on raspi4 (Raspberry Pi 4)': {
+                node('J-RASP4-1') {
+                    stage('Run Performance Tests on raspi4') {
+                        sh '''#!/bin/bash
+                            ./run_tests_performance.sh raspi4
+                        '''
+                    }
+                    stage('Make Clean on raspi4') {
+                        sh '''#!/bin/bash
+                            make clean
+                        '''
+                    }
+                    stage('Stash Performance Results from raspi4') {
+                        stash includes: 'performance_results_raspi4.csv', name: 'raspi4-performance-results'
+                    }
+                }
+            },
+            'Run Performance Tests on x86 Machine (qemu-riscv64, qemu-aarch64, spike)': {
+                node('J-QMU-1') {
+                    stage('Run Performance Tests on qemu-riscv64, qemu-aarch64, spike') {
+                        parallel(
+                            'Run Performance Tests on qemu-riscv64': {
+                                sh '''#!/bin/bash -l
+                                    source "$MODULE_INIT"
+                                    module load riscv64-gnu-glibc/02022024
+                                    ./run_tests_performance.sh qemu-riscv64
+                                '''
+                            },
+                            'Run Performance Tests on qemu-aarch64': {
                                 sh '''#!/bin/bash -l
                                     source "$MODULE_INIT"
                                     module load gcc-aarch64-none-linux-gnu/13.3.rel1
                                     ./run_tests_performance.sh qemu-aarch64
                                 '''
+                            },
+                            'Run Performance Tests on spike': {
+                                sh '''#!/bin/bash -l
+                                    source "$MODULE_INIT"
+                                    module load riscv64-gnu-glibc/02022024
+                                    module load spike/1.1.1-dev
+                                    ./run_tests_performance.sh spike
+                                '''
                             }
                         )
                     }
-                )
+                    stage('Make Clean on x86 Machine') {
+                        sh '''#!/bin/bash
+                            make clean
+                        '''
+                    }
+                }
             }
-            stage('Archive Results from qemu-riscv64 and qemu-aarch64') {
-                // Archive the performance and correctness results from qemu-riscv64 and qemu-aarch64
-                // archiveArtifacts artifacts: 'performance_results_qemu-riscv64.csv,correctness_results_qemu-riscv64.csv,performance_results_qemu-aarch64.csv,correctness_results_qemu-aarch64.csv', allowEmptyArchive: true
-            }
-        }
+        )
     }
 )
 
 node('J-QMU-1') {
-    stage('Unstash Results from bpif3 to x86 Machine') {
-        // Unstash the results from bpif3
-        unstash 'bpif3-results'
+    stage('Unstash Performance Results from bpif3 and raspi4') {
+        unstash 'bpif3-performance-results'
+        unstash 'raspi4-performance-results'
     }
-    stage('Unstash Results from raspi4 to x86 Machine') {
-        // Unstash the results from raspi4
-        unstash 'raspi4-results'
-    }
-    stage('Generate Combined Correctness Comparison') {
-        // Generate the correctness comparison graph
+    stage('Generate Performance Comparison Across Targets') {
         sh '''#!/bin/bash
-            ./combined_correctness_comparison.sh
+            ./performance_comparison_results.sh
         '''
     }
-    stage('Generate Combined Performance Comparison') {
-        // Generate the performance comparison graph
-        sh '''#!/bin/bash
-            ./combined_performance_comparison.sh
-        '''
+    stage('Archive Performance Results') {
+        archiveArtifacts artifacts: 'performance_results.csv', allowEmptyArchive: true
     }
-    stage('Archive Combined Results') {
-        // Archive the combined performance and correctness results
-        archiveArtifacts artifacts: 'combined_performance_results.csv,combined_correctness_results.csv', allowEmptyArchive: true
-    }
-    stage('Generate Combined Correctness Graph and Archive') {
-        // Generate the correctness comparison graph
-        sh '''#!/bin/bash
-            python3 generate_correctness_graph.py
-        '''
-        // Archive the generated correctness graph
-        archiveArtifacts artifacts: 'correctness_results_bpif3.png,correctness_results_raspi4.png,correctness_results_qemu-riscv64.png', allowEmptyArchive: true
-    }
-    stage('Generate Combined Performance Graph and Archive') {
+    stage('Generate Performance Graph Across Targets and Archive Graph') {
         // Generate the performance comparison graph
         sh '''#!/bin/bash
             python3 generate_performance_graph.py
         '''
         // Archive the generated performance graph
-        archiveArtifacts artifacts: 'performance_comparison_qemu-aarch64_vs_qemu-riscv64.png,performance_comparison_raspi4_vs_bpif3.png', allowEmptyArchive: true
+        archiveArtifacts artifacts: 'performance_comparison_across_targets.png', allowEmptyArchive: true
     }
 }
