@@ -9,24 +9,39 @@ MAKEFILE_DIR := $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 # Default architecture
 ARCH ?= riscv
 
-# Default RISCV_PREFIX
+# Default target
+TARGET ?= qemu-riscv64
+
+# Default toolchain prefixes
 RISCV_PREFIX := riscv64-unknown-linux-gnu
-# Default ARM_PREFIX
 ARM_PREFIX := aarch64-none-linux-gnu
+BPIF3_PREFIX := riscv64-linux-gnu
+RASPI4_PREFIX := aarch64-linux-gnu
 
 # Default prefixes and tools based on architecture
 ifeq ($(ARCH),riscv)
-    CROSS_PREFIX := ${RISCV_PREFIX}
-    QEMU := qemu-riscv64
-    SPIKE := spike
-    SPIKE_ISA ?= rv64imafdcv_zba_zbb_zbc_zbs
-    PK := pk
     ARCH_FLAG := -DRISCV_VECTOR
+    ifeq ($(TARGET),qemu-riscv64)
+        CROSS_PREFIX := ${RISCV_PREFIX}
+        QEMU := qemu-riscv64
+    else ifeq ($(TARGET),spike)
+        CROSS_PREFIX := ${RISCV_PREFIX}
+        SPIKE := spike
+        SPIKE_ISA ?= rv64imafdcv_zba_zbb_zbc_zbs
+        PK := pk
+    else ifeq ($(TARGET),bpif3)
+        CROSS_PREFIX := ${BPIF3_PREFIX}
+        BPIF3 := bpif3
+    endif
 else ifeq ($(ARCH),arm)
-    CROSS_PREFIX := ${ARM_PREFIX}
-    QEMU := qemu-aarch64
-    SPIKE :=
     ARCH_FLAG := -DARM_NEON
+    ifeq ($(TARGET),qemu-aarch64)
+        CROSS_PREFIX := ${ARM_PREFIX}
+        QEMU := qemu-aarch64
+    else ifeq ($(TARGET),raspi4)
+        CROSS_PREFIX := ${RASPI4_PREFIX}
+        RASPI4 := raspi4
+    endif
 endif
 
 # Project name
@@ -314,14 +329,36 @@ DISM_EXP = "${CROSS_PREFIX}-objdump ${OBJDUMP_FLAGS} $< > $@"
 ##############################################################################
 # Targets
 
-.PHONY: default setup test spike qemu clean
+.PHONY: default setup test spike qemu bpif3 raspi4 clean
 
-default: compile $(if $(SPIKE),spike) qemu
+# Default target based on TARGET variable
+ifeq ($(TARGET),qemu-riscv64)
+default: compile  qemu
+else ifeq ($(TARGET),spike)
+default: compile spike
+else ifeq ($(TARGET),qemu-aarch64)
+default: compile qemu
+else ifeq ($(TARGET),bpif3)
+default: compile bpif3
+else ifeq ($(TARGET),raspi4)
+default: compile raspi4
+else
+$(error "Unsupported TARGET: $(TARGET)")
+endif
 
 setup: test
 	mkdir -p ${RUN_DIR}
-	mkdir -p ${RUN_DIR}/${SPIKE}
+ifeq ($(TARGET),qemu-riscv64)
 	mkdir -p ${RUN_DIR}/${QEMU}
+else ifeq ($(TARGET),spike)
+	mkdir -p ${RUN_DIR}/${SPIKE}
+else ifeq ($(TARGET),qemu-aarch64)
+	mkdir -p ${RUN_DIR}/${QEMU}
+else ifeq ($(TARGET),bpif3)
+	mkdir -p ${RUN_DIR}/${BPIF3}
+else ifeq ($(TARGET),raspi4)
+	mkdir -p ${RUN_DIR}/${RASPI4}
+endif
 
 ${ELF_FILE}: setup ${SRCS}
 	@echo ""
@@ -369,6 +406,14 @@ spike:
 qemu:
 	@echo ""
 	$(QEMU) ${ELF_FILE} -D 1> ${RUN_DIR}/$(QEMU)/$@.out 2> ${RUN_DIR}/$(QEMU)/$@.log
+
+bpif3:
+	@echo ""
+	${ELF_FILE} 1> ${RUN_DIR}/$(BPIF3)/$@.out 2> ${RUN_DIR}/$(BPIF3)/$@.log
+
+raspi4:
+	@echo ""
+	${ELF_FILE} 1> ${RUN_DIR}/$(RASPI4)/$@.out 2> ${RUN_DIR}/$(RASPI4)/$@.log
 
 clean:
 	rm -f  $(MAKEFILE_DIR)/temp.sh
