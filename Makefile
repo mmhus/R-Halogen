@@ -19,16 +19,18 @@ ifeq ($(ARCH),riscv)
     CROSS_PREFIX := ${RISCV_PREFIX}
     QEMU := qemu-riscv64
     SPIKE := spike
-    SPIKE_ISA ?= rv64imafdcv
+    SPIKE_ISA ?= rv64imafdcv_zba_zbb_zbc_zbs
     PK := pk
+    ARCH_FLAG := -DRISCV_VECTOR
 else ifeq ($(ARCH),arm)
     CROSS_PREFIX := ${ARM_PREFIX}
     QEMU := qemu-aarch64
     SPIKE :=
+    ARCH_FLAG := -DARM_NEON
 endif
 
 # Project name
-PROJECT := R-Halogen
+# PROJECT := R-Halogen
 
 # Source file(s)
 SRCS :=
@@ -198,7 +200,7 @@ ifneq ($(ARCH_V),0)
 endif
 
 # Final cflags
-CFLAGS2 := ${CFLAGS_PROJECT} ${CFLAG_ENTROPY} ${CFLAGS} ${CFLAGS_V}
+CFLAGS2 := ${CFLAGS_PROJECT} ${CFLAG_ENTROPY} ${CFLAGS} ${CFLAGS_V} ${ARCH_FLAG}
 
 # Run and output directory
 SUBD ?= default
@@ -233,13 +235,14 @@ ENV_SRCS := \
 	$(wildcard $(ENV_DIR_REALPATH)/*.S)
 
 COMMON_DIR := $(MAKEFILE_DIR)/common
-COMMON_SRCS := \
+COMMON_INCLUDE_DIR := $(COMMON_DIR)/include
+COMMON_SRCS := $(COMMON_DIR)/src/*.c
 
 SOURCE_DIR := $(MAKEFILE_DIR)/source
 ifeq ($(ARCH), riscv)
     SOURCE_SRCS := ${SOURCE_DIR}/*.c
 else ifeq ($(ARCH), arm)
-    SOURCE_SRCS :=
+    SOURCE_SRCS := 
 endif
 
 FRAMEWORK_CFLAGS := \
@@ -247,8 +250,8 @@ FRAMEWORK_CFLAGS := \
 	-ffreestanding \
 	-static \
 	-fno-builtin \
-	-I${FRAMEWORK_DIR} \
 	-I${COMMON_DIR} \
+	-I${COMMON_INCLUDE_DIR} \
 	-I${SOURCE_DIR} \
 	-I${ENV_DIR_REALPATH} \
 	-I${LIB_DIR_REALPATH} \

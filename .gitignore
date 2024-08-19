@@ -1,0 +1,18 @@
+# Executable files
+*.elf
+
+# Disassembly files
+*.asm
+
+# Log files
+*.log
+
+# Out files
+*.out
+
+# VS Code files
+.vscode/*
+.vscode*
+
+# Project RUN dir, containing executable and log file
+RUN/*
