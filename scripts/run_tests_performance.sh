@@ -48,6 +48,9 @@ tests=(
     "vsub_s32_rvv_test"
     "vsub_s64_rvv_test"
     "vsub_u8_rvv_test"
+    "vsub_u16_rvv_test"
+    "vsub_u32_rvv_test"
+    "vsub_u64_rvv_test"
 )
 
 # Define the log file
