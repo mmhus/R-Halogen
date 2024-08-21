@@ -11,7 +11,7 @@ parallel(
                     }
                     stage('Run Correctness Tests on bpif3') {
                         sh '''#!/bin/bash
-                            ./run_tests_correctness.sh bpif3
+                            ./scripts/run_tests_correctness.sh bpif3
                         '''
                     }
                     stage('Make Clean on bpif3') {
@@ -34,7 +34,7 @@ parallel(
                     }
                     stage('Run Correctness Tests on raspi4') {
                         sh '''#!/bin/bash
-                            ./run_tests_correctness.sh raspi4
+                            ./scripts/run_tests_correctness.sh raspi4
                         '''
                     }
                     stage('Make Clean on raspi4') {
@@ -77,14 +77,14 @@ parallel(
                                 sh '''#!/bin/bash -l
                                     source "$MODULE_INIT"
                                     module load riscv64-gnu-glibc/02022024
-                                    ./run_tests_correctness.sh qemu-riscv64
+                                    ./scripts/run_tests_correctness.sh qemu-riscv64
                                 '''
                             },
                             'Run Correctness Tests on qemu-aarch64': {
                                 sh '''#!/bin/bash -l
                                     source "$MODULE_INIT"
                                     module load gcc-aarch64-none-linux-gnu/13.3.rel1
-                                    ./run_tests_correctness.sh qemu-aarch64
+                                    ./scripts/run_tests_correctness.sh qemu-aarch64
                                 '''
                             },
                             'Run Correctness Tests on spike': {
@@ -92,7 +92,7 @@ parallel(
                                     source "$MODULE_INIT"
                                     module load riscv64-gnu-glibc/02022024
                                     module load spike/1.1.1-dev
-                                    ./run_tests_correctness.sh spike
+                                    ./scripts/run_tests_correctness.sh spike
                                 '''
                             }
                         )
@@ -115,7 +115,7 @@ node('J-QMU-1') {
     }
     stage('Generate Correctness Comparison Across Targets') {
         sh '''#!/bin/bash
-            ./correctness_comparison_results.sh
+            ./scripts/correctness_comparison_results.sh
         '''
     }
     stage('Archive Correctness Results') {
@@ -130,7 +130,7 @@ parallel(
                 node('J-BPF3-1') {
                     stage('Run Performance Tests on bpif3') {
                         sh '''#!/bin/bash
-                            ./run_tests_performance.sh bpif3
+                            ./scripts/run_tests_performance.sh bpif3
                         '''
                     }
                     stage('Make Clean on bpif3') {
@@ -147,7 +147,7 @@ parallel(
                 node('J-RASP4-1') {
                     stage('Run Performance Tests on raspi4') {
                         sh '''#!/bin/bash
-                            ./run_tests_performance.sh raspi4
+                            ./scripts/run_tests_performance.sh raspi4
                         '''
                     }
                     stage('Make Clean on raspi4') {
@@ -168,14 +168,14 @@ parallel(
                                 sh '''#!/bin/bash -l
                                     source "$MODULE_INIT"
                                     module load riscv64-gnu-glibc/02022024
-                                    ./run_tests_performance.sh qemu-riscv64
+                                    ./scripts/run_tests_performance.sh qemu-riscv64
                                 '''
                             },
                             'Run Performance Tests on qemu-aarch64': {
                                 sh '''#!/bin/bash -l
                                     source "$MODULE_INIT"
                                     module load gcc-aarch64-none-linux-gnu/13.3.rel1
-                                    ./run_tests_performance.sh qemu-aarch64
+                                    ./scripts/run_tests_performance.sh qemu-aarch64
                                 '''
                             },
                             'Run Performance Tests on spike': {
@@ -183,7 +183,7 @@ parallel(
                                     source "$MODULE_INIT"
                                     module load riscv64-gnu-glibc/02022024
                                     module load spike/1.1.1-dev
-                                    ./run_tests_performance.sh spike
+                                    ./scripts/run_tests_performance.sh spike
                                 '''
                             }
                         )
@@ -206,7 +206,7 @@ node('J-QMU-1') {
     }
     stage('Generate Performance Comparison Across Targets') {
         sh '''#!/bin/bash
-            ./performance_comparison_results.sh
+            ./scripts/performance_comparison_results.sh
         '''
     }
     stage('Archive Performance Results') {
@@ -215,7 +215,7 @@ node('J-QMU-1') {
     stage('Generate Performance Graph Across Targets and Archive Graph') {
         // Generate the performance comparison graph
         sh '''#!/bin/bash
-            python3 generate_performance_graph.py
+            python3 scripts/generate_performance_graph.py
         '''
         // Archive the generated performance graph
         archiveArtifacts artifacts: 'performance_comparison_across_targets.png', allowEmptyArchive: true
