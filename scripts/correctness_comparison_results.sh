@@ -16,7 +16,7 @@ BPIF3_RESULTS_CSV="${4:-correctness_results_bpif3.csv}"
 RASPI4_RESULTS_CSV="${5:-correctness_results_raspi4.csv}"
 
 # Path to the 2-argument correctness script
-CORRECTNESS_SCRIPT="./correctness_comparison.sh"
+CORRECTNESS_SCRIPT="./scripts/correctness_comparison.sh"
 
 # Temporary files to store individual comparison results
 TEMP_AARCH64_RISCV64="temp_qemu_aarch64_vs_qemu_riscv64.csv"
