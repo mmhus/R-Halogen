@@ -110,6 +110,38 @@ uint16x8_t vsubq_u16_rvv(uint16x8_t a, uint16x8_t b);
 uint32x4_t vsubq_u32_rvv(uint32x4_t a, uint32x4_t b);
 uint64x2_t vsubq_u64_rvv(uint64x2_t a, uint64x2_t b);
 
+int16x8_t vsubl_s8_rvv(int8x8_t a, int8x8_t b);
+int32x4_t vsubl_s16_rvv(int16x4_t a, int16x4_t b);
+int64x2_t vsubl_s32_rvv(int32x2_t a, int32x2_t b);
+
+uint16x8_t vsubl_u8_rvv(uint8x8_t a, uint8x8_t b);
+uint32x4_t vsubl_u16_rvv(uint16x4_t a, uint16x4_t b);
+uint64x2_t vsubl_u32_rvv(uint32x2_t a, uint32x2_t b);
+
+int16x8_t vsubw_s8_rvv(int16x8_t a, int8x8_t b);
+int32x4_t vsubw_s16_rvv(int32x4_t a, int16x4_t b);
+int64x2_t vsubw_s32_rvv(int64x2_t a, int32x2_t b);
+
+uint16x8_t vsubw_u8_rvv(uint16x8_t a, uint8x8_t b);
+uint32x4_t vsubw_u16_rvv(uint32x4_t a, uint16x4_t b);
+uint64x2_t vsubw_u32_rvv(uint64x2_t a, uint32x2_t b);
+
+int8x8_t vhsub_s8_rvv(int8x8_t a, int8x8_t b);
+int16x4_t vhsub_s16_rvv(int16x4_t a, int16x4_t b);
+int32x2_t vhsub_s32_rvv(int32x2_t a, int32x2_t b);
+
+int8x16_t vhsubq_s8_rvv(int8x16_t a, int8x16_t b);
+int16x8_t vhsubq_s16_rvv(int16x8_t a, int16x8_t b);
+int32x4_t vhsubq_s32_rvv(int32x4_t a, int32x4_t b);
+
+uint8x8_t vhsub_u8_rvv(uint8x8_t a, uint8x8_t b);
+uint16x4_t vhsub_u16_rvv(uint16x4_t a, uint16x4_t b);
+uint32x2_t vhsub_u32_rvv(uint32x2_t a, uint32x2_t b);
+
+uint8x16_t vhsubq_u8_rvv(uint8x16_t a, uint8x16_t b);
+uint16x8_t vhsubq_u16_rvv(uint16x8_t a, uint16x8_t b);
+uint32x4_t vhsubq_u32_rvv(uint32x4_t a, uint32x4_t b);
+
 #ifdef __cplusplus
 }
 #endif
