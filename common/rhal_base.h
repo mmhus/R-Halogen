@@ -16,8 +16,6 @@ extern "C" {
 #define VLEN_8  8
 #define VLEN_16 16
 
-#define VXRM_RNU 0
-
 /* 64-bit vector register length */
 typedef vint8m1_t int8x8_t;
 typedef vint16m1_t int16x4_t;
