@@ -119,6 +119,22 @@ tests=(
     "vrhaddq_u8_rvv_test"
     "vrhaddq_u16_rvv_test"
     "vrhaddq_u32_rvv_test"
+    "vqadd_s8_rvv_test"
+    "vqadd_s16_rvv_test"
+    "vqadd_s32_rvv_test"
+    "vqadd_s64_rvv_test"
+    "vqaddq_s8_rvv_test"
+    "vqaddq_s16_rvv_test"
+    "vqaddq_s32_rvv_test"
+    "vqaddq_s64_rvv_test"
+    "vqadd_u8_rvv_test"
+    "vqadd_u16_rvv_test"
+    "vqadd_u32_rvv_test"
+    "vqadd_u64_rvv_test"
+    "vqaddq_u8_rvv_test"
+    "vqaddq_u16_rvv_test"
+    "vqaddq_u32_rvv_test"
+    "vqaddq_u64_rvv_test"
 )
 
 # Define the log file for correctness results
