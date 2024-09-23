@@ -125,6 +125,14 @@ uint16x8_t vqaddq_u16_rvv(uint16x8_t a, uint16x8_t b);
 uint32x4_t vqaddq_u32_rvv(uint32x4_t a, uint32x4_t b);
 uint64x2_t vqaddq_u64_rvv(uint64x2_t a, uint64x2_t b);
 
+int8x8_t vaddhn_s16_rvv(int16x8_t a, int16x8_t b);
+int16x4_t vaddhn_s32_rvv(int32x4_t a, int32x4_t b);
+int32x2_t vaddhn_s64_rvv(int64x2_t a, int64x2_t b);
+
+uint8x8_t vaddhn_u16_rvv(uint16x8_t a, uint16x8_t b);
+uint16x4_t vaddhn_u32_rvv(uint32x4_t a, uint32x4_t b);
+uint32x2_t vaddhn_u64_rvv(uint64x2_t a, uint64x2_t b);
+
 /* vsub* */
 int8x8_t vsub_s8_rvv(int8x8_t a, int8x8_t b);
 int16x4_t vsub_s16_rvv(int16x4_t a, int16x4_t b);
@@ -197,6 +205,14 @@ uint8x16_t vqsubq_u8_rvv(uint8x16_t a, uint8x16_t b);
 uint16x8_t vqsubq_u16_rvv(uint16x8_t a, uint16x8_t b);
 uint32x4_t vqsubq_u32_rvv(uint32x4_t a, uint32x4_t b);
 uint64x2_t vqsubq_u64_rvv(uint64x2_t a, uint64x2_t b);
+
+int8x8_t vsubhn_s16_rvv(int16x8_t a, int16x8_t b);
+int16x4_t vsubhn_s32_rvv(int32x4_t a, int32x4_t b);
+int32x2_t vsubhn_s64_rvv(int64x2_t a, int64x2_t b);
+
+uint8x8_t vsubhn_u16_rvv(uint16x8_t a, uint16x8_t b);
+uint16x4_t vsubhn_u32_rvv(uint32x4_t a, uint32x4_t b);
+uint32x2_t vsubhn_u64_rvv(uint64x2_t a, uint64x2_t b);
 
 #ifdef __cplusplus
 }
