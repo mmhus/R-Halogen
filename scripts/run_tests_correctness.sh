@@ -163,6 +163,18 @@ tests=(
     "vsubhn_u16_rvv_test"
     "vsubhn_u32_rvv_test"
     "vsubhn_u64_rvv_test"
+    "vraddhn_s16_rvv_test"
+    "vraddhn_s32_rvv_test"
+    "vraddhn_s64_rvv_test"
+    "vraddhn_u16_rvv_test"
+    "vraddhn_u32_rvv_test"
+    "vraddhn_u64_rvv_test"
+    "vrsubhn_s16_rvv_test"
+    "vrsubhn_s32_rvv_test"
+    "vrsubhn_s64_rvv_test"
+    "vrsubhn_u16_rvv_test"
+    "vrsubhn_u32_rvv_test"
+    "vrsubhn_u64_rvv_test"
 )
 
 # Define the log file for correctness results
